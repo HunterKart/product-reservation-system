@@ -10,7 +10,7 @@ export function ReservationForm() {
 
   const [formData, setFormData] = useState({
     product_id: id,
-    name: 'Default User', // Default name for the single user
+    name: 'Jimarnie Branzuela', // Updated default name for the single user
     quantity: 1,
     status: 'pending'
   });
@@ -31,7 +31,7 @@ export function ReservationForm() {
           const reservation = await getReservation(id);
           setFormData({
             product_id: reservation.product_id,
-            name: 'Default User', // Always use default name
+            name: 'Jimarnie Branzuela', // Always use this specific name
             quantity: reservation.quantity,
             status: reservation.status
           });
@@ -159,6 +159,16 @@ export function ReservationForm() {
           )}
           
           <form onSubmit={handleSubmit} className="mt-6">
+            {/* Display user name (non-editable) */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Reserved By
+              </label>
+              <div className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 bg-gray-100">
+                {formData.name}
+              </div>
+            </div>
+            
             <div className="mb-4">
               <label htmlFor="quantity" className="block text-gray-700 text-sm font-bold mb-2">
                 Quantity*

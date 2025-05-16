@@ -116,7 +116,7 @@ class ReservationController {
                     if($this->product->quantity >= $data->quantity) {
                         // Set reservation property values
                         $this->reservation->product_id = $data->product_id;
-                        $this->reservation->name = $data->name ?? 'Default User'; // Always use default name if not provided
+                        $this->reservation->name = $data->name ?? 'Jimarnie Branzuela'; // Always use specific name if not provided
                         $this->reservation->quantity = $data->quantity;
                         $this->reservation->status = isset($data->status) ? $data->status : "pending";
 
@@ -215,7 +215,7 @@ class ReservationController {
 
                     // Set reservation property values - keeping original product_id and name
                     $this->reservation->product_id = $original_product_id;
-                    $this->reservation->name = 'Default User'; // Always use default name
+                    $this->reservation->name = 'Jimarnie Branzuela'; // Always use this specific name
                     $this->reservation->quantity = $data->quantity;
                     $this->reservation->status = isset($data->status) ? $data->status : $this->reservation->status;
 

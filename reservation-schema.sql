@@ -42,8 +42,8 @@ INSERT INTO products (name, quantity, description) VALUES
 
 -- Insert sample reservation data
 INSERT INTO reservations (product_id, name, quantity, status) VALUES
-(1, 'John Doe', 2, 'confirmed'),
-(3, 'Jane Smith', 1, 'pending'),
-(5, 'Mike Johnson', 1, 'confirmed'),
-(2, 'Sarah Williams', 3, 'pending'),
-(4, 'David Brown', 2, 'confirmed');
+(1, 'Jimarnie Branzuela', 2, 'confirmed'),
+(3, 'Jimarnie Branzuela', 1, 'pending'),
+(5, 'Jimarnie Branzuela', 1, 'confirmed'),
+(2, 'Jimarnie Branzuela', 3, 'pending'),
+(4, 'Jimarnie Branzuela', 2, 'confirmed');
