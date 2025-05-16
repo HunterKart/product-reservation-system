@@ -119,6 +119,29 @@ class ReservationController {
                         $this->reservation->name = $data->name ?? 'Jimarnie Branzuela'; // Always use specific name if not provided
                         $this->reservation->quantity = $data->quantity;
                         $this->reservation->status = isset($data->status) ? $data->status : "pending";
+                        
+                        // Set reservation date if provided
+                        if (isset($data->reservation_date)) {
+                            // Validate that the date is not more than a month away
+                            $selectedDate = new DateTime($data->reservation_date);
+                            $today = new DateTime('today');
+                            $maxDate = clone $today;
+                            $maxDate->modify('+1 month');
+                            
+                            if ($selectedDate < $today) {
+                                // Date is in the past
+                                http_response_code(400);
+                                echo json_encode(array("message" => "Reservation date cannot be in the past."));
+                                return;
+                            } else if ($selectedDate > $maxDate) {
+                                // Date is more than a month away
+                                http_response_code(400);
+                                echo json_encode(array("message" => "Reservation date cannot be more than 1 month from today."));
+                                return;
+                            }
+                            
+                            $this->reservation->reservation_date = $data->reservation_date;
+                        }
 
                         // Create the reservation
                         if($this->reservation->create()) {
@@ -218,6 +241,29 @@ class ReservationController {
                     $this->reservation->name = 'Jimarnie Branzuela'; // Always use this specific name
                     $this->reservation->quantity = $data->quantity;
                     $this->reservation->status = isset($data->status) ? $data->status : $this->reservation->status;
+                    
+                    // Set reservation date if provided
+                    if (isset($data->reservation_date)) {
+                        // Validate that the date is not more than a month away
+                        $selectedDate = new DateTime($data->reservation_date);
+                        $today = new DateTime('today');
+                        $maxDate = clone $today;
+                        $maxDate->modify('+1 month');
+                        
+                        if ($selectedDate < $today) {
+                            // Date is in the past
+                            http_response_code(400);
+                            echo json_encode(array("message" => "Reservation date cannot be in the past."));
+                            return;
+                        } else if ($selectedDate > $maxDate) {
+                            // Date is more than a month away
+                            http_response_code(400);
+                            echo json_encode(array("message" => "Reservation date cannot be more than 1 month from today."));
+                            return;
+                        }
+                        
+                        $this->reservation->reservation_date = $data->reservation_date;
+                    }
 
                     // Update the reservation
                     if($this->reservation->update()) {
@@ -260,6 +306,15 @@ class ReservationController {
 
             // Check if reservation exists and get its details
             if($this->reservation->readOne()) {
+                // Check if reservation is delivered or returned - don't allow deletion if it is
+                if($this->reservation->status === 'delivered' || $this->reservation->status === 'returned') {
+                    // Set response code - 403 Forbidden
+                    http_response_code(403);
+                    // Tell the user
+                    echo json_encode(array("message" => "Cannot cancel " . $this->reservation->status . " reservations. Please contact support for assistance."));
+                    return;
+                }
+                
                 // Store reservation details for updating product
                 $product_id = $this->reservation->product_id;
                 $quantity = $this->reservation->quantity;

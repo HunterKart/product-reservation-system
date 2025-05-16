@@ -47,3 +47,6 @@ INSERT INTO reservations (product_id, name, quantity, status) VALUES
 (5, 'Jimarnie Branzuela', 1, 'confirmed'),
 (2, 'Jimarnie Branzuela', 3, 'pending'),
 (4, 'Jimarnie Branzuela', 2, 'confirmed');
+
+ALTER TABLE reservations
+MODIFY COLUMN date DATE NULL;

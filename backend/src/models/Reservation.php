@@ -10,6 +10,7 @@ class Reservation {
     public $quantity;
     public $date;
     public $status;
+    public $reservation_date; // This will map to the date field
 
     // Constructor with DB connection
     public function __construct($db) {
@@ -25,6 +26,11 @@ class Reservation {
                     name = :name,
                     quantity = :quantity,
                     status = :status";
+        
+        // Add date to query if provided
+        if (!empty($this->reservation_date)) {
+            $query .= ", date = :date";
+        }
 
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -34,12 +40,22 @@ class Reservation {
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->quantity = htmlspecialchars(strip_tags($this->quantity));
         $this->status = htmlspecialchars(strip_tags($this->status));
+        
+        // Sanitize reservation date if provided
+        if (!empty($this->reservation_date)) {
+            $this->reservation_date = htmlspecialchars(strip_tags($this->reservation_date));
+        }
 
         // Bind data
         $stmt->bindParam(":product_id", $this->product_id);
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":quantity", $this->quantity);
         $stmt->bindParam(":status", $this->status);
+        
+        // Bind date if provided
+        if (!empty($this->reservation_date)) {
+            $stmt->bindParam(":date", $this->reservation_date);
+        }
 
         // Execute query
         if($stmt->execute()) {
@@ -120,9 +136,14 @@ class Reservation {
                     product_id = :product_id,
                     name = :name,
                     quantity = :quantity,
-                    status = :status
-                WHERE
-                    id = :id";
+                    status = :status";
+        
+        // Add date to query if provided
+        if (!empty($this->reservation_date)) {
+            $query .= ", date = :date";
+        }
+        
+        $query .= " WHERE id = :id";
 
         // Prepare statement
         $stmt = $this->conn->prepare($query);
@@ -133,6 +154,11 @@ class Reservation {
         $this->quantity = htmlspecialchars(strip_tags($this->quantity));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->id = htmlspecialchars(strip_tags($this->id));
+        
+        // Sanitize reservation date if provided
+        if (!empty($this->reservation_date)) {
+            $this->reservation_date = htmlspecialchars(strip_tags($this->reservation_date));
+        }
 
         // Bind data
         $stmt->bindParam(":product_id", $this->product_id);
@@ -140,6 +166,11 @@ class Reservation {
         $stmt->bindParam(":quantity", $this->quantity);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":id", $this->id);
+        
+        // Bind date if provided
+        if (!empty($this->reservation_date)) {
+            $stmt->bindParam(":date", $this->reservation_date);
+        }
 
         // Execute query
         if($stmt->execute()) {

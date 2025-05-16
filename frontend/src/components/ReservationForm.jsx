@@ -12,7 +12,8 @@ export function ReservationForm() {
     product_id: id,
     name: 'Jimarnie Branzuela', // Updated default name for the single user
     quantity: 1,
-    status: 'pending'
+    status: 'pending',
+    reservation_date: formatDate(new Date()) // Default to today's date, formatted as YYYY-MM-DD
   });
   
   const [product, setProduct] = useState(null);
@@ -20,6 +21,21 @@ export function ReservationForm() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+
+  // Helper function to format date as YYYY-MM-DD
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
+    const day = String(date.getDate()).padStart(2, '0'); // Add leading zero if needed
+    return `${year}-${month}-${day}`;
+  }
+
+  // Get the maximum date (1 month from today)
+  function getMaxDate() {
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 1); // Add 1 month
+    return formatDate(maxDate);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +49,8 @@ export function ReservationForm() {
             product_id: reservation.product_id,
             name: 'Jimarnie Branzuela', // Always use this specific name
             quantity: reservation.quantity,
-            status: reservation.status
+            status: reservation.status,
+            reservation_date: reservation.date ? reservation.date.split(' ')[0] : formatDate(new Date()) // Extract date part if available
           });
           // Also fetch the product details for display
           const productData = await getProduct(reservation.product_id);
@@ -65,6 +82,26 @@ export function ReservationForm() {
       errors.quantity = `Quantity cannot exceed available stock (${product.quantity})`;
     }
     
+    if (!formData.reservation_date) {
+      errors.reservation_date = 'Please select a reservation date';
+    } else {
+      // Check if the selected date is not in the past
+      const selectedDate = new Date(formData.reservation_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+      
+      // Calculate maximum allowed date (1 month from today)
+      const maxDate = new Date();
+      maxDate.setMonth(maxDate.getMonth() + 1);
+      maxDate.setHours(23, 59, 59, 999); // Set to end of day
+      
+      if (selectedDate < today) {
+        errors.reservation_date = 'Reservation date cannot be in the past';
+      } else if (selectedDate > maxDate) {
+        errors.reservation_date = 'Reservation date cannot be more than 1 month from today';
+      }
+    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -91,10 +128,17 @@ export function ReservationForm() {
     try {
       setSubmitting(true);
       
+      // Create a copy of the form data with the correct field names for the API
+      const apiData = {
+        ...formData,
+        // Use the reservation_date as date for the API
+        reservation_date: formData.reservation_date
+      };
+      
       if (isEditing) {
-        await updateReservation(id, formData);
+        await updateReservation(id, apiData);
       } else {
-        await createReservation(formData);
+        await createReservation(apiData);
       }
       
       // Redirect to reservations list
@@ -188,6 +232,26 @@ export function ReservationForm() {
               )}
             </div>
             
+            {/* Add date picker */}
+            <div className="mb-4">
+              <label htmlFor="reservation_date" className="block text-gray-700 text-sm font-bold mb-2">
+                Reservation Date*
+              </label>
+              <input
+                type="date"
+                id="reservation_date"
+                name="reservation_date"
+                value={formData.reservation_date}
+                onChange={handleChange}
+                min={formatDate(new Date())} // Prevent selecting dates in the past
+                max={getMaxDate()} // Limit to 1 month from today
+                className={`shadow appearance-none border ${formErrors.reservation_date ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+              />
+              {formErrors.reservation_date && (
+                <p className="text-red-500 text-xs italic">{formErrors.reservation_date}</p>
+              )}
+            </div>
+            
             {isEditing && (
               <div className="mb-6">
                 <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">
@@ -203,6 +267,8 @@ export function ReservationForm() {
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
                   <option value="canceled">Canceled</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="returned">Returned</option>
                 </select>
               </div>
             )}

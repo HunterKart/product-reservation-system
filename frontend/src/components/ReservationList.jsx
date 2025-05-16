@@ -27,6 +27,18 @@ export function ReservationList() {
   }, []);
 
   const handleDelete = async (id) => {
+    // Find the reservation by id
+    const reservation = reservations.find(res => res.id === id);
+    
+    // Check if the reservation status is delivered or returned
+    if (reservation.status === 'delivered' || reservation.status === 'returned') {
+      setDeleteStatus({ 
+        success: false, 
+        error: `${reservation.status === 'delivered' ? 'Delivered' : 'Returned'} reservations cannot be cancelled. Please contact support if you need assistance.` 
+      });
+      return;
+    }
+    
     if (window.confirm('Are you sure you want to cancel this reservation?')) {
       try {
         await deleteReservation(id);
@@ -57,6 +69,10 @@ export function ReservationList() {
         return 'bg-yellow-100 text-yellow-800';
       case 'canceled':
         return 'bg-red-100 text-red-800';
+      case 'delivered':
+        return 'bg-blue-100 text-blue-800';
+      case 'returned':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -127,7 +143,15 @@ export function ReservationList() {
                           <div className="text-sm text-gray-900">{reservation.quantity}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{new Date(reservation.date).toLocaleDateString()}</div>
+                          <div className="text-sm text-gray-900">{
+                            reservation.date 
+                              ? new Date(reservation.date).toLocaleDateString(undefined, {
+                                  year: 'numeric', 
+                                  month: 'long', 
+                                  day: 'numeric'
+                                })
+                              : 'Not specified'
+                          }</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(reservation.status)}`}>
@@ -138,12 +162,18 @@ export function ReservationList() {
                           <Link to={`/edit-reservation/${reservation.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">
                             Edit
                           </Link>
-                          <button
-                            onClick={() => handleDelete(reservation.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Cancel
-                          </button>
+                          {reservation.status === 'pending' || reservation.status === 'confirmed' ? (
+                            <button
+                              onClick={() => handleDelete(reservation.id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Cancel
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 cursor-not-allowed" title={`${reservation.status} reservations cannot be cancelled`}>
+                              Cancel
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}
