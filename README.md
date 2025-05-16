@@ -25,6 +25,7 @@ A modern web application that allows users to browse products and make reservati
 - **Product Management**: View detailed product listings with inventory information
 - **Reservation System**: Make reservations for specific products with quantity selection
 - **Reservation Management**: View, update, and cancel your reservations
+- **Single User Experience**: Simplified interface designed for a single user without the need to input name for each reservation
 - **Responsive Design**: Tailwind CSS ensures a beautiful experience on all devices
 - **Robust Validation**: Both client and server-side validation for all operations
 - **Error Handling**: Comprehensive error handling throughout the application

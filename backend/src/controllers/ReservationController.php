@@ -107,7 +107,6 @@ class ReservationController {
             // Validate data
             if(
                 !empty($data->product_id) &&
-                !empty($data->name) &&
                 !empty($data->quantity)
             ) {
                 // Check if product exists and has sufficient stock
@@ -117,7 +116,7 @@ class ReservationController {
                     if($this->product->quantity >= $data->quantity) {
                         // Set reservation property values
                         $this->reservation->product_id = $data->product_id;
-                        $this->reservation->name = $data->name;
+                        $this->reservation->name = $data->name ?? 'Default User'; // Always use default name if not provided
                         $this->reservation->quantity = $data->quantity;
                         $this->reservation->status = isset($data->status) ? $data->status : "pending";
 
@@ -184,72 +183,39 @@ class ReservationController {
                 $original_product_id = $this->reservation->product_id;
                 $original_quantity = $this->reservation->quantity;
 
-                // Validate data
-                if(
-                    !empty($data->product_id) &&
-                    !empty($data->name) &&
-                    !empty($data->quantity)
-                ) {
-                    // Handle quantity changes and product changes
-                    if($data->product_id == $original_product_id) {
-                        // Same product, just check if quantity difference is valid
-                        $quantity_diff = $data->quantity - $original_quantity;
+                // Validate data - only quantity and status are required for updates
+                if(!empty($data->quantity)) {
+                    // Handle quantity changes
+                    $quantity_diff = $data->quantity - $original_quantity;
 
-                        // Check if we need more products
-                        if($quantity_diff > 0) {
-                            // Load current product details
-                            $this->product->id = $data->product_id;
-                            $this->product->readOne();
-
-                            // Check if enough stock
-                            if($this->product->quantity < $quantity_diff) {
-                                // Not enough stock
-                                http_response_code(400);
-                                echo json_encode(array("message" => "Insufficient stock for this product."));
-                                return;
-                            }
-
-                            // Update product quantity
-                            $this->product->quantity -= $quantity_diff;
-                            $this->product->updateQuantity();
-                        } else if($quantity_diff < 0) {
-                            // Returning products to stock
-                            $this->product->id = $data->product_id;
-                            $this->product->readOne();
-                            $this->product->quantity += abs($quantity_diff);
-                            $this->product->updateQuantity();
-                        }
-                    } else {
-                        // Different product, return original quantity to original product
+                    // Check if we need more products
+                    if($quantity_diff > 0) {
+                        // Load current product details
                         $this->product->id = $original_product_id;
                         $this->product->readOne();
-                        $this->product->quantity += $original_quantity;
-                        $this->product->updateQuantity();
 
-                        // Check if new product has enough stock
-                        $this->product->id = $data->product_id;
-                        if($this->product->readOne()) {
-                            if($this->product->quantity < $data->quantity) {
-                                // Not enough stock
-                                http_response_code(400);
-                                echo json_encode(array("message" => "Insufficient stock for this product."));
-                                return;
-                            }
-
-                            // Deduct from new product
-                            $this->product->quantity -= $data->quantity;
-                            $this->product->updateQuantity();
-                        } else {
-                            // New product not found
-                            http_response_code(404);
-                            echo json_encode(array("message" => "Product not found."));
+                        // Check if enough stock
+                        if($this->product->quantity < $quantity_diff) {
+                            // Not enough stock
+                            http_response_code(400);
+                            echo json_encode(array("message" => "Insufficient stock for this product."));
                             return;
                         }
+
+                        // Update product quantity
+                        $this->product->quantity -= $quantity_diff;
+                        $this->product->updateQuantity();
+                    } else if($quantity_diff < 0) {
+                        // Returning products to stock
+                        $this->product->id = $original_product_id;
+                        $this->product->readOne();
+                        $this->product->quantity += abs($quantity_diff);
+                        $this->product->updateQuantity();
                     }
 
-                    // Set reservation property values
-                    $this->reservation->product_id = $data->product_id;
-                    $this->reservation->name = $data->name;
+                    // Set reservation property values - keeping original product_id and name
+                    $this->reservation->product_id = $original_product_id;
+                    $this->reservation->name = 'Default User'; // Always use default name
                     $this->reservation->quantity = $data->quantity;
                     $this->reservation->status = isset($data->status) ? $data->status : $this->reservation->status;
 
@@ -275,7 +241,7 @@ class ReservationController {
                     echo json_encode(array("message" => "Unable to update reservation. Data is incomplete."));
                 }
             } else {
-                // Reservation not found
+                // Not found
                 http_response_code(404);
                 echo json_encode(array("message" => "Reservation not found."));
             }

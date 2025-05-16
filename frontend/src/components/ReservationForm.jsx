@@ -10,7 +10,7 @@ export function ReservationForm() {
 
   const [formData, setFormData] = useState({
     product_id: id,
-    name: '',
+    name: 'Default User', // Default name for the single user
     quantity: 1,
     status: 'pending'
   });
@@ -31,7 +31,7 @@ export function ReservationForm() {
           const reservation = await getReservation(id);
           setFormData({
             product_id: reservation.product_id,
-            name: reservation.name,
+            name: 'Default User', // Always use default name
             quantity: reservation.quantity,
             status: reservation.status
           });
@@ -58,10 +58,6 @@ export function ReservationForm() {
 
   const validateForm = () => {
     const errors = {};
-    
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
-    }
     
     if (!formData.quantity || formData.quantity <= 0) {
       errors.quantity = 'Quantity must be greater than 0';
@@ -163,24 +159,6 @@ export function ReservationForm() {
           )}
           
           <form onSubmit={handleSubmit} className="mt-6">
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                Your Name*
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`shadow appearance-none border ${formErrors.name ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-                placeholder="Enter your name"
-              />
-              {formErrors.name && (
-                <p className="text-red-500 text-xs italic">{formErrors.name}</p>
-              )}
-            </div>
-            
             <div className="mb-4">
               <label htmlFor="quantity" className="block text-gray-700 text-sm font-bold mb-2">
                 Quantity*
