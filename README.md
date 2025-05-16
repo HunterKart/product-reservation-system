@@ -1,122 +1,182 @@
 # Product Reservation System
 
-A simple product reservation system with full CRUD functionality built with React, PHP (Flight framework), and MySQL.
+A modern web application that allows users to browse products and make reservations. This full-stack system demonstrates CRUD operations with React on the frontend and PHP with Flight framework on the backend.
 
-## Project Structure
+![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-- `backend/` - PHP backend API using Flight framework
-- `frontend/` - React frontend with Vite and Tailwind CSS
-- `reservation-schema.sql` - Database schema and sample data
+## 📋 Table of Contents
 
-## Features
+- [Features](#features)
+- [Demo](#demo)
+- [Technology Stack](#technology-stack)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
+  - [Database Setup](#database-setup)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
-- View a list of available products
-- Make a reservation by selecting a product and specifying a quantity
-- View all reservations
-- Update an existing reservation
-- Delete or cancel a reservation
+## ✨ Features
 
-## Requirements
+- **Product Management**: View detailed product listings with inventory information
+- **Reservation System**: Make reservations for specific products with quantity selection
+- **Reservation Management**: View, update, and cancel your reservations
+- **Responsive Design**: Tailwind CSS ensures a beautiful experience on all devices
+- **Robust Validation**: Both client and server-side validation for all operations
+- **Error Handling**: Comprehensive error handling throughout the application
 
-- XAMPP or similar local server environment with PHP 7.4+ and MySQL
-- Node.js 16+ and npm for the frontend
-- Composer for PHP dependencies
+## 🚀 Technology Stack
 
-## Setup Instructions
+### Frontend
+- **React 18+** with JSX files
+- **React Router 6** for navigation
+- **Vite** as the build tool
+- **Tailwind CSS** for styling
+- **ES6+** features and modern JavaScript patterns
 
-### 1. Clone the repository
+### Backend
+- **PHP 7.4+**
+- **Flight PHP** microframework
+- **PDO** for database interactions
+- **MySQL** database
 
-Clone this repository to your XAMPP htdocs directory.
+### Communication
+- **AJAX** via the Fetch API
+- **RESTful API** design principles
 
-### 2. Database Setup
+## 💻 Installation
 
-1. Start XAMPP and ensure MySQL service is running
-2. Open HeidiSQL or phpMyAdmin
-3. Import the `reservation-schema.sql` file to create the database and tables with sample data
+### Prerequisites
 
-### 3. Backend Setup
+- **XAMPP** or similar local server environment with PHP 7.4+ and MySQL
+- **Node.js** 16+ and npm
+- **Composer** for PHP dependencies
+- **Git** for version control
 
-1. Navigate to the backend directory:
+### Clone the Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/product-reservation-system.git
+
+# Navigate to the project directory
+cd product-reservation-system
 ```
+
+### Backend Setup
+
+```bash
+# Navigate to the backend directory
 cd backend
-```
 
-2. Install PHP dependencies using Composer:
-```
+# Install PHP dependencies
 composer install
+
+# (Optional) If you need to configure your environment, copy and modify .env.example
+# cp .env.example .env
 ```
 
-3. (Optional) You can run the setup-db.php script to set up the database:
-```
-php setup-db.php
-```
+### Frontend Setup
 
-### 4. Frontend Setup
-
-1. Navigate to the frontend directory:
-```
+```bash
+# Navigate to the frontend directory
 cd frontend
-```
 
-2. Install dependencies:
-```
+# Install dependencies
 npm install
-```
 
-3. (Optional) Create a `.env` file in the frontend directory for environment variables:
-```
-# frontend/.env
-VITE_API_URL=http://localhost/reservation-system-final/backend
-```
+# Create .env file for environment variables (if needed)
+echo "VITE_API_URL=http://localhost/product-reservation-system/backend" > .env
 
-4. Start the development server:
-```
+# Start the development server
 npm run dev
 ```
 
-5. The frontend application will be accessible at `http://localhost:3000`
+### Database Setup
 
-### 5. API Endpoints
+1. Start XAMPP and ensure MySQL service is running
+2. Import the database schema from `reservation-schema.sql`:
 
-The API will be available at `http://localhost/reservation-system-final/backend/api`:
+```bash
+# Using MySQL CLI (alternative to phpMyAdmin)
+mysql -u root -p < reservation-schema.sql
+```
 
-- Products:
-  - GET `/products` - List all products
-  - GET `/products/{id}` - Get product details
+Alternatively, use phpMyAdmin or HeidiSQL:
+1. Open your database management tool
+2. Create a new database called `product_reservation_system`
+3. Import the `reservation-schema.sql` file
 
-- Reservations:
-  - GET `/reservations` - List all reservations
-  - GET `/reservations/{id}` - Get reservation details
-  - POST `/reservations` - Create a new reservation
-  - PUT `/reservations/{id}` - Update a reservation
-  - DELETE `/reservations/{id}` - Delete a reservation
+## 🔍 Usage
 
-## Security Considerations
+1. Start your MySQL server and Apache (via XAMPP)
+2. Ensure the backend is accessible at `http://localhost/product-reservation-system/backend`
+3. Start the frontend development server: `cd frontend && npm run dev`
+4. Access the application at `http://localhost:3000`
 
-- The API uses PDO with prepared statements to prevent SQL injection
-- Input validation is performed on both client and server side
-- Full error handling with try/catch blocks
+### Key Functionality
 
-## Technology Stack
+- **Browse Products**: The home page displays all available products
+- **Make Reservation**: Click "Reserve" on any product to create a reservation
+- **View Reservations**: Navigate to "My Reservations" to see your bookings
+- **Update/Cancel**: Edit or cancel your reservations as needed
 
-- **Frontend**:
-  - React 18+ with JSX files
-  - React Router for navigation
-  - Vite as the build tool (faster and more modern than Create React App)
-  - Tailwind CSS for styling
-  - Modern JavaScript with ES6+ features
+## 📚 API Documentation
 
-- **Backend**:
-  - PHP 7.4+
-  - Flight PHP microframework
-  - PDO for database interactions
-  - MySQL database
-  
-- **API Communication**:
-  - AJAX via the fetch API
+The API is available at `http://localhost/product-reservation-system/backend/api`:
 
-## Notes
+### Products
+- `GET /products` - List all products
+- `GET /products/{id}` - Get product details
 
-- This is a basic implementation without authentication or admin features
-- In a real-world scenario, you would want to add user authentication and role-based access control
-- The frontend URL in the API service (`frontend/src/services/api.js`) may need to be adjusted based on your local environment setup 
+### Reservations
+- `GET /reservations` - List all reservations
+- `GET /reservations/{id}` - Get reservation details
+- `POST /reservations` - Create a new reservation
+- `PUT /reservations/{id}` - Update a reservation
+- `DELETE /reservations/{id}` - Delete a reservation
+
+## 📁 Project Structure
+
+```
+product-reservation-system/
+├── backend/                # PHP backend
+│   ├── composer.json       # PHP dependencies
+│   ├── .htaccess           # Apache configuration
+│   ├── index.php           # Main entry point
+│   └── src/                # Source files
+│       ├── config/         # Database configuration
+│       ├── controllers/    # Request controllers
+│       ├── models/         # Data models
+│       └── routes/         # API routes
+├── frontend/               # React frontend
+│   ├── index.html          # HTML entry point
+│   ├── package.json        # Node dependencies
+│   ├── vite.config.js      # Vite configuration
+│   └── src/                # Source files
+│       ├── components/     # React components
+│       └── services/       # API services
+└── reservation-schema.sql  # Database schema
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+Developed with ❤️ using React, PHP, and Tailwind CSS 
